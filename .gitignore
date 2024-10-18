@@ -1,0 +1,14 @@
+.idea/
+*.iml
+.vscode/
+*.json
+.DS_Store
+*/vendor/
+*.code-workspace
+*.prof
+coverage.out
+__debug_bin
+*.env
+*.log
+*.out
+*.pem
