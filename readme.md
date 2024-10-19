@@ -7,6 +7,8 @@ A simple and easy to use HTTP server for Go.
 - Simple and easy to use
 - Supports global middlewares
 - Supports route middlewares
+- Supports group middlewares
+- Supports group routes
 - Supports context values
 - Supports path parameters
 - Supports JSON binding
