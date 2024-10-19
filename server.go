@@ -26,6 +26,10 @@ func (s *Server) Use(middlewares ...MiddlewareFunc) {
 	s.globalMiddlewares = middlewares
 }
 
+func (s *Server) Group(path string) *Group {
+	return NewGroup(path, s)
+}
+
 func (s *Server) GET(path string, handlerFunc HandlerFunc, middlewares ...MiddlewareFunc) {
 	s.mux.HandleFunc(s.getFullPath(http.MethodGet, path), s.applyMiddlewares(middlewares, handlerFunc))
 }
