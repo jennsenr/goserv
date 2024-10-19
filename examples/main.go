@@ -25,10 +25,11 @@ func main() {
 	s.Use(GlobalMiddleware(), LoggerMiddleware())
 
 	s.GET("/health", handleHealthCheck(), RouteMiddleware())
-	s.POST("/", handlePost)
-	s.GET("/", handleGet)
-	s.GET("/{userID}", handleFind)
-	s.PUT("/{userID}", handlePut)
+
+	u := s.Group("/users", GroupMiddleware())
+	u.POST("/", createUser)
+	u.GET("/{userID}", findUser)
+	u.PUT("/{userID}", updateUser)
 
 	fmt.Printf("running on %v\n", "8080")
 
@@ -41,6 +42,13 @@ func main() {
 func RouteMiddleware() func(req *goserv.Request) *goserv.Response {
 	return func(req *goserv.Request) *goserv.Response {
 		fmt.Println("route middleware")
+		return nil
+	}
+}
+
+func GroupMiddleware() func(req *goserv.Request) *goserv.Response {
+	return func(req *goserv.Request) *goserv.Response {
+		fmt.Println("group middleware")
 		return nil
 	}
 }
@@ -65,7 +73,7 @@ func handleHealthCheck() func(req *goserv.Request) goserv.Response {
 	}
 }
 
-func handlePut(req *goserv.Request) goserv.Response {
+func updateUser(req *goserv.Request) goserv.Response {
 	userID := req.GetPathParam("userID")
 
 	user := users[userID]
@@ -86,7 +94,7 @@ func handlePut(req *goserv.Request) goserv.Response {
 	return goserv.NewDataResponse(user)
 }
 
-func handlePost(req *goserv.Request) goserv.Response {
+func createUser(req *goserv.Request) goserv.Response {
 	payload := new(CreateUser)
 
 	err := req.Bind(payload)
@@ -104,15 +112,7 @@ func handlePost(req *goserv.Request) goserv.Response {
 	return goserv.NewDataResponse(user)
 }
 
-func handleGet(req *goserv.Request) goserv.Response {
-	role := req.GetContextValue("role")
-
-	fmt.Printf("role desde la ruta: %v", role)
-
-	return goserv.NewDataResponse(users)
-}
-
-func handleFind(req *goserv.Request) goserv.Response {
+func findUser(req *goserv.Request) goserv.Response {
 	userID := req.GetPathParam("userID")
 
 	user := users[userID]
