@@ -26,8 +26,8 @@ func (s *Server) Use(middlewares ...MiddlewareFunc) {
 	s.globalMiddlewares = middlewares
 }
 
-func (s *Server) Group(path string) *Group {
-	return NewGroup(path, s)
+func (s *Server) Group(path string, middlewares ...MiddlewareFunc) *Group {
+	return NewGroup(path, s, middlewares...)
 }
 
 func (s *Server) GET(path string, handlerFunc HandlerFunc, middlewares ...MiddlewareFunc) {
