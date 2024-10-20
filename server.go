@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 )
 
 type Server struct {
@@ -15,7 +16,7 @@ type Server struct {
 
 func New(basePath, port string) *Server {
 	return &Server{
-		basePath:          basePath,
+		basePath:          strings.TrimSuffix(strings.TrimSpace(basePath), "/"),
 		port:              port,
 		mux:               http.NewServeMux(),
 		globalMiddlewares: make([]MiddlewareFunc, 0),
