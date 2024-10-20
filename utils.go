@@ -8,7 +8,7 @@ import (
 
 func (s *Server) getFullPath(httpMethod, path string) string {
 	var fullPath string
-	if s.basePath != "" {
+	if s.basePath != "" && s.basePath != "/" {
 		fullPath = s.basePath + path
 	} else {
 		fullPath = path
