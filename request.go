@@ -1,8 +1,11 @@
 package goserv
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -45,4 +48,55 @@ func (r *Request) GetHeaderValue(key string) string {
 
 func (r *Request) Path() string {
 	return r.Request.URL.Path
+}
+
+func (r *Request) Headers() map[string]any {
+	headerBytes, err := json.Marshal(r.Request.Header)
+	if err != nil {
+		return make(map[string]any)
+	}
+
+	headers := make(map[string]any)
+
+	err = json.Unmarshal(headerBytes, &headers)
+	if err != nil {
+		return make(map[string]any)
+	}
+
+	return headers
+}
+
+func (r *Request) BodyBytes() ([]byte, error) {
+	if r.Request.Body == nil {
+		return []byte{}, nil
+	}
+
+	reqBody, err := io.ReadAll(r.Request.Body)
+	if err != nil {
+		return []byte{}, fmt.Errorf("cannot read request body: %w", err)
+	}
+
+	r.Request.Body = io.NopCloser(bytes.NewBuffer(reqBody))
+
+	return reqBody, nil
+}
+
+func (r *Request) BodyMap() (map[string]any, error) {
+	body, err := r.BodyBytes()
+	if err != nil {
+		return make(map[string]any), err
+	}
+
+	if len(body) == 0 {
+		return make(map[string]any), nil
+	}
+
+	var bodyMap map[string]any
+
+	err = json.Unmarshal(body, &bodyMap)
+	if err != nil {
+		return make(map[string]any), fmt.Errorf("cannot unmarshal request body: %w", err)
+	}
+
+	return bodyMap, nil
 }
