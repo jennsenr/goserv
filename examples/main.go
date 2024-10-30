@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/jennsenr/goserv"
 	"log"
+	"math/rand"
+	"strconv"
 )
 
 type User struct {
@@ -12,6 +14,10 @@ type User struct {
 }
 
 type CreateUser struct {
+	Name string `json:"name"`
+}
+
+type UpdateUser struct {
 	Name string `json:"name"`
 }
 
@@ -76,13 +82,12 @@ func handleHealthCheck() func(req *goserv.Request) goserv.Response {
 func updateUser(req *goserv.Request) goserv.Response {
 	userID := req.GetPathParam("userID")
 
-	user := users[userID]
-
-	if user == nil {
+	user, ok := users[userID]
+	if !ok {
 		return goserv.NewNotFoundResponse()
 	}
 
-	payload := new(CreateUser)
+	payload := new(UpdateUser)
 
 	err := req.Bind(payload)
 	if err != nil {
@@ -103,7 +108,7 @@ func createUser(req *goserv.Request) goserv.Response {
 	}
 
 	user := User{
-		ID:   "123",
+		ID:   strconv.Itoa(rand.Intn(1000)),
 		Name: payload.Name,
 	}
 
@@ -115,9 +120,8 @@ func createUser(req *goserv.Request) goserv.Response {
 func findUser(req *goserv.Request) goserv.Response {
 	userID := req.GetPathParam("userID")
 
-	user := users[userID]
-
-	if user == nil {
+	user, ok := users[userID]
+	if !ok {
 		return goserv.NewNotFoundResponse()
 	}
 
